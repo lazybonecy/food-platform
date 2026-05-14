@@ -1,0 +1,59 @@
+server:
+  port: 8084
+
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3307/food_article?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai
+    username: root
+    password: ${DB_PASSWORD:root123456}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  data:
+    redis:
+      host: localhost
+      port: 6379
+  ai:
+    openai:
+      api-key: ${AI_API_KEY:your-api-key}
+      base-url: ${AI_BASE_URL:https://api.xiaomimimo.com}
+      chat:
+        options:
+          model: ${AI_CHAT_MODEL:mimo-v2.5-pro}
+    ollama:
+      base-url: http://localhost:11434
+      embedding:
+        options:
+          model: bge-m3
+    vectorstore:
+      milvus:
+        uri: http://localhost:19530
+        collection-name: food_articles
+        index-type: HNSW
+        metric-type: COSINE
+        embedding-dimension: 1024
+  autoconfigure:
+    exclude:
+      - com.alibaba.cloud.ai.autoconfigure.dashscope.DashScopeAutoConfiguration
+      - org.springframework.ai.autoconfigure.vectorstore.milvus.MilvusVectorStoreAutoConfiguration
+
+# 优惠券服务地址（通过 gateway）
+food:
+  order:
+    base-url: http://localhost:8080
+  search:
+    expand-enabled: false  # LLM查询扩写，开启后召回更全但多一次LLM调用
+    rerank-enabled: true  # cross-encoder精排
+  rerank:
+    provider: ${RERANK_PROVIDER:dashscope}  # local 或 dashscope
+    enabled: true
+    local:
+      base-url: http://localhost:8100
+      model: BAAI/bge-reranker-v2-m3
+    dashscope:
+      api-key: ${DASHSCOPE_API_KEY:your-dashscope-key}
+      model: qwen3-vl-rerank
+
+mybatis-plus:
+  mapper-locations: classpath:mapper/*.xml
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl

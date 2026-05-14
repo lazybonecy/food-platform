@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: food-ai-agent
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8848
+        ip: localhost
+      config:
+        server-addr: localhost:8848
+        file-extension: yml

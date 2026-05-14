@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: food-order
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8848
+        ip: localhost
+      config:
+        server-addr: localhost:8848
+        file-extension: yml
+
+dubbo:
+  protocol:
+    name: dubbo
+    port: -1
+  registry:
+    address: nacos://localhost:8848
+    group: DUBBO
+  scan:
+    base-packages: com.food.order.dubbo
+  consumer:
+    check: false

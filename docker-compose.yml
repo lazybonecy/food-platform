@@ -1,0 +1,77 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: food-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root123456
+      MYSQL_DATABASE: food_user
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./sql/init.sql:/docker-entrypoint-initdb.d/init.sql
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+
+  redis:
+    image: redis:7-alpine
+    container_name: food-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+  nacos:
+    image: nacos/nacos-server:v2.3.1
+    container_name: food-nacos
+    environment:
+      MODE: standalone
+      SPRING_DATASOURCE_PLATFORM: ""
+      JVM_XMS: 256m
+      JVM_XMX: 256m
+    ports:
+      - "8848:8848"
+      - "9848:9848"
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: food-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+
+  milvus:
+    image: milvusdb/milvus:v2.4.17
+    container_name: food-milvus
+    environment:
+      ETCD_USE_EMBED: "true"
+      COMMON_STORAGE_TYPE: local
+    ports:
+      - "19530:19530"
+      - "9091:9091"
+    volumes:
+      - milvus_data:/var/lib/milvus
+    command: ["milvus", "run", "standalone"]
+
+  vllm-rerank:
+    build: ./docker/vllm-rerank
+    container_name: food-vllm-rerank
+    ports:
+      - "8100:8000"
+    volumes:
+      - huggingface_cache:/root/.cache
+    environment:
+      - TRANSFORMERS_CACHE=/root/.cache
+
+volumes:
+  mysql_data:
+  redis_data:
+  rabbitmq_data:
+  milvus_data:
+  huggingface_cache:

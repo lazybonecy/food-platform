@@ -1,0 +1,37 @@
+server:
+  port: 8080
+
+spring:
+  data:
+    redis:
+      host: localhost
+      port: 6379
+  cloud:
+    gateway:
+      httpclient:
+        http-version: HTTP_1_1
+      routes:
+        - id: food-user
+          uri: lb://food-user
+          predicates:
+            - Path=/api/auth/**,/api/user/**,/api/merchant/**
+        - id: food-article
+          uri: lb://food-article
+          predicates:
+            - Path=/api/article/**,/api/comment/**,/api/notification/**
+        - id: food-ai-agent
+          uri: lb://food-ai-agent
+          predicates:
+            - Path=/api/ai/**
+        - id: food-order
+          uri: lb://food-order
+          predicates:
+            - Path=/api/coupon/**
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOriginPatterns: "*"
+            allowedMethods: "*"
+            allowedHeaders: "*"
+            allowCredentials: true
+            maxAge: 3600

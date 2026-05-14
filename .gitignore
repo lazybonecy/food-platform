@@ -1,0 +1,32 @@
+# Build output
+target/
+*.class
+*.jar
+*.war
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.settings/
+.project
+.classpath
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+
+# Database files
+*.mv.db
+*.trace.db
+
+# Claude
+.claude/
+
+# Env
+.env
+*.env.local
