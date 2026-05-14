@@ -257,11 +257,57 @@ mysql -h 127.0.0.1 -P 3307 -u root -proot123456 < sql/init.sql
 
 ### 3. 配置 API Key
 
-编辑 `food-ai-agent/src/main/resources/application.yml`，或通过环境变量注入：
+本项目使用 Spring Profile 机制管理敏感配置。`application.yml` 中使用占位符（可安全提交 git），本地开发通过 `application-local.yml` 覆盖实际值。
+
+在每个服务的 `src/main/resources/` 下创建 `application-local.yml`（已在 `.gitignore` 中，不会被提交）：
+
+**food-ai-agent/src/main/resources/application-local.yml：**
+
+```yaml
+spring:
+  datasource:
+    password: root123456
+  ai:
+    openai:
+      api-key: your-actual-api-key
+    vectorstore:
+      milvus:
+        uri: http://localhost:19530
+
+food:
+  rerank:
+    dashscope:
+      api-key: your-dashscope-key
+```
+
+**food-article / food-order / food-user 各自的 application-local.yml：**
+
+```yaml
+spring:
+  datasource:
+    password: root123456
+```
+
+**IDEA 中激活 local profile：**
+
+Run Configuration → VM options 添加：
+
+```
+-Dspring.profiles.active=local
+```
+
+**命令行启动：**
+
+```bash
+mvn spring-boot:run -Dspring-boot.run.profiles=local
+```
+
+**或使用环境变量（CI/CD 推荐）：**
 
 ```bash
 export AI_API_KEY=your-actual-api-key
 export DASHSCOPE_API_KEY=your-dashscope-key
+export DB_PASSWORD=root123456
 ```
 
 ### 4. 启动后端服务
